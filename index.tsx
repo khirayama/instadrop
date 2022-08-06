@@ -33,10 +33,67 @@ import {
   useClipboard,
 } from '@chakra-ui/react'
 import { CopyIcon } from '@chakra-ui/icons';
+import i18next from 'i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { FileRecieveModal } from './components/FileRecieveModal';
 import { UserForm } from './components/UserForm';
 import { Invitation } from './components/Invitation';
+
+i18next
+  .use(LanguageDetector)
+  .init({
+    fallbackLng: 'en',
+    debug: true,
+    resources: {
+      en: {
+        translation: {
+          createNewSpaceButton: 'START NEW SHARING',
+          you: 'You',
+          sharableUsers: 'Sharable Users',
+          inviteButton: 'INVITE',
+          shareTextButton: 'SHARE TEXT',
+          shareFileButton: 'SHARE FILES',
+          invite: 'Invite',
+          loadingShareKey: 'Loading',
+          copyToast: 'Copied',
+          join: 'Join',
+          shareKeyInputPlaceholder: '4-digit share key',
+          sharedFileMessage: 'Shared {{count}} files',
+          closeButton: 'CLOSE',
+          recieveButton: 'RECIEVE',
+          shareText: 'Share Text',
+          shareTextPlaceholder: 'Input text',
+          submitButton: 'SUBMIT',
+          sharedTextMessage: 'Shared text',
+        }
+      },
+      ja: {
+        translation: {
+          createNewSpaceButton: '新しい共有をはじめる',
+          you: 'あなた',
+          sharableUsers: '共有可能な相手',
+          inviteButton: '招待する',
+          shareTextButton: 'テキストを共有する',
+          shareFileButton: 'ファイルを共有する',
+          invite: '招待する',
+          loadingShareKey: '取得中',
+          copyToast: 'コピーしました',
+          join: '参加する',
+          shareKeyInputPlaceholder: '4桁の共有キーを入力',
+          sharedFileMessage: '{{count}}件のファイルが共有されました',
+          closeButton: '閉じる',
+          recieveButton: '受け取る',
+          shareText: 'テキストを共有',
+          shareTextPlaceholder: 'テキストを入力',
+          submitButton: '送信',
+          sharedTextMessage: 'テキストを共有されました',
+        }
+      }
+    }
+  });
+
+const t = i18next.t;
 
 export type User = {
   id: string;
@@ -214,19 +271,19 @@ function Page(props: Props) {
 
       <Modal onClose={textSendingModalDisclosure.onClose} isOpen={textSendingModalDisclosure.isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent w="88%" maxW="420px">
-          <ModalHeader>テキストを共有</ModalHeader>
+        <ModalContent w="88%" maxW="420px" maxH="88%">
+          <ModalHeader>{t('shareText')}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <form onSubmit={onTextSubmit} onPaste={onPaste} >
               <ButtonGroup w="100%">
-                <Input autoFocus w="100%" placeholder='テキストを入力' value={inputText} onChange={(e) => setInputText(e.currentTarget.value)} />
-                <Button type="submit">送信</Button>
+                <Input autoFocus w="100%" placeholder={t('shareTextPlaceholder')} value={inputText} onChange={(e) => setInputText(e.currentTarget.value)} />
+                <Button type="submit">{t('submitButton')}</Button>
               </ButtonGroup>
             </form>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={textSendingModalDisclosure.onClose}>閉じる</Button>
+            <Button onClick={textSendingModalDisclosure.onClose}>{t('closeButton')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -235,14 +292,14 @@ function Page(props: Props) {
 
       <Modal onClose={textRecieveModalDisclosure.onClose} isOpen={textRecieveModalDisclosure.isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent w="88%" maxW="420px">
-          <ModalHeader>テキストを共有されました。</ModalHeader>
+        <ModalContent w="88%" maxW="420px" maxH="88%">
+          <ModalHeader>{t('sharedTextMessage')}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Flex>
               <ButtonGroup w="100%" isAttached variant='outline' onClick={() => {
                 toast({
-                  title: 'コピーしました',
+                  title: t('copyToast'),
                   duration: 4000,
                 });
                 onCopy();
@@ -253,7 +310,7 @@ function Page(props: Props) {
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={textRecieveModalDisclosure.onClose}>閉じる</Button>
+            <Button onClick={textRecieveModalDisclosure.onClose}>{t('closeButton')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -262,14 +319,14 @@ function Page(props: Props) {
         <Button
           variant="link"
           onClick={onCreateNewSpaceButton}
-        >新しい共有をはじめる</Button>
+        >{t('createNewSpaceButton')}</Button>
       </Center>
 
       <Divider />
 
       <Box p={4}>
         <Stack>
-          <Heading as="h3" size="sm">あなた</Heading>
+          <Heading as="h3" size="sm">{t('you')}</Heading>
           <Flex>
             <Avatar
               size='lg'
@@ -294,13 +351,13 @@ function Page(props: Props) {
           <Stack p={4}>
             <Flex>
               <Center>
-                <Heading as="h3" size="sm">共有可能な相手</Heading>
+                <Heading as="h3" size="sm">{t('sharableUsers')}</Heading>
               </Center>
               <Spacer />
               <Button
                 justifyContent="left"
                 onClick={invitationModalDisclosure.onOpen}
-              >招待する</Button>
+              >{t('inviteButton')}</Button>
             </Flex>
             <Grid templateColumns="repeat(auto-fit, minmax(92px, 1fr))">
               {users
@@ -315,9 +372,9 @@ function Page(props: Props) {
             </Grid>
             <Flex justifyContent="center">
               <HStack>
-                <Button isDisabled={selectedUserIds.length === 0} onClick={textSendingModalDisclosure.onOpen}>テキストを共有する</Button>
+                <Button isDisabled={selectedUserIds.length === 0} onClick={textSendingModalDisclosure.onOpen}>{t('shareTextButton')}</Button>
                 <form onChange={onFileInputChange} onSubmit={(e) => e.preventDefault()}>
-                  <Button isDisabled={selectedUserIds.length === 0} onClick={() => refInputFile.current.click()}>ファイルを共有する</Button>
+                  <Button isDisabled={selectedUserIds.length === 0} onClick={() => refInputFile.current.click()}>{t('shareFileButton')}</Button>
                   <input type="file" multiple ref={refInputFile} style={{ display: 'none' }} />
                 </form>
               </HStack>

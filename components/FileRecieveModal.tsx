@@ -12,12 +12,14 @@ import {
   ModalBody,
   ModalCloseButton,
 } from '@chakra-ui/react'
-
+import i18next from 'i18next';
 import { Navigation, Pagination } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react/swiper-react.js'; // TODO
 
 import 'swiper/swiper-bundle.min.css'
 import 'swiper/swiper.min.css'
+
+const t = i18next.t;
 
 type FileRecieveModalProps = {
   files: any[]; // TODO
@@ -32,7 +34,7 @@ export function FileRecieveModal(props: FileRecieveModalProps) {
     <Modal onClose={dc.onClose} isOpen={dc.isOpen} isCentered>
       <ModalOverlay />
       <ModalContent maxW="88%">
-        <ModalHeader>{`${files.length}件のファイルを共有されました。`}</ModalHeader>
+        <ModalHeader>{t('sharedFilesMessage', { count: files.length })}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Swiper
@@ -81,10 +83,10 @@ export function FileRecieveModal(props: FileRecieveModalProps) {
           </Swiper>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={dc.onClose}>閉じる</Button>
+          <Button onClick={dc.onClose}>{t('closeButton')}</Button>
           <Button variant='ghost' onClick={() => {
             Array.from(document.querySelectorAll('a[download]')).forEach((el) => el.click());
-          }}>受け取る</Button>
+          }}>{t('recieveButton')}</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

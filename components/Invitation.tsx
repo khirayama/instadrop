@@ -21,8 +21,10 @@ import {
   useClipboard,
 } from '@chakra-ui/react'
 import { CopyIcon } from '@chakra-ui/icons';
+import i18next from 'i18next';
 
 const width = 128;
+const t = i18next.t;
 
 function generateURL(shareKey: string) {
   return `${window.location.origin}?key=${shareKey}`;
@@ -49,10 +51,10 @@ export function Invitation(props: Props) {
   return (
     <Box>
       <Stack>
-        <Heading size="md">招待する</Heading>
+        <Heading size="md">{t('invite')}</Heading>
         <Center>
           <Stack>
-            <Heading size="2xl">{props.shareKey ? props.shareKey : '取得中'}</Heading>
+            <Heading size="2xl">{props.shareKey ? props.shareKey : t('loadingShareKey')}</Heading>
             <Image src={qr} fallbackSrc='https://via.placeholder.com/198' />
           </Stack>
         </Center>
@@ -61,7 +63,7 @@ export function Invitation(props: Props) {
       <Flex py={4}>
         <ButtonGroup w="100%" isAttached variant='outline' onClick={() => {
           toast({
-            title: 'コピーしました',
+            title: t('copyToast'),
             duration: 4000,
           });
           onCopy();
@@ -75,12 +77,12 @@ export function Invitation(props: Props) {
 
       <Flex pt={4} pb={4}>
         <Stack w="100%">
-          <Heading size="md">参加する</Heading>
+          <Heading size="md">{t('join')}</Heading>
           <Input
             type="text"
             autoComplete="off"
             inputMode="email"
-            placeholder="4桁の共有キーを入力"
+            placeholder={t('shareKeyInputPlaceholder')}
             maxLength={6}
             onChange={(event) => {
               const shareKey = event.currentTarget.value;
