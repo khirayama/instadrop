@@ -21,6 +21,7 @@ import {
   Avatar,
   AvatarGroup,
   Input,
+  Select,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -35,6 +36,7 @@ import {
 import { CopyIcon } from '@chakra-ui/icons';
 import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import * as qs from 'query-string';
 
 import { FileRecieveModal } from './components/FileRecieveModal';
 import { UserForm } from './components/UserForm';
@@ -44,7 +46,6 @@ i18next
   .use(LanguageDetector)
   .init({
     fallbackLng: 'en',
-    debug: true,
     resources: {
       en: {
         translation: {
@@ -117,6 +118,7 @@ function Page(props: Props) {
   const [ inputText, setInputText ] = useState('');
   const [ text, setText ] = useState('');
   const [ selectedUserIds, setSelectedUserIds ] = useState([]);
+  const [ lng, setLng ] = useState(i18next.language);
 
   const invitationModalDisclosure = useDisclosure();
   const fileRecieveModalDisclosure = useDisclosure();
@@ -136,7 +138,9 @@ function Page(props: Props) {
     socket.on('update:user', (d) => {
       setShareKey(d.key)
       setUser(d.user)
-      history.replaceState(null, '', `?key=${d.key}`)
+      const q = qs.parse(location.search);
+      q.key = d.key;
+      history.replaceState(null, '', `/?${qs.stringify(q)}`)
     });
 
     socket.on('update:users', (d) => {
@@ -166,13 +170,26 @@ function Page(props: Props) {
   });
 
   const onCreateNewSpaceButton = useCallback(() => {
-    history.pushState(null, '', '/')
+    const q = qs.parse(location.search);
+    delete q.key;
+    history.pushState(null, '', `/?${qs.stringify(q)}`)
     socket.disconnect();
     socket.connect();
   }, []);
 
+  const onLanguageSelectChange = useCallback((event: FormEvent<SelectHTMLElement>) => {
+    const q = qs.parse(location.search);
+    const lang = event.currentTarget.value;
+    q.lng = lang;
+    history.replaceState(null, '', `/?${qs.stringify(q)}`)
+    i18next.changeLanguage(lang);
+    setLng(lang);
+  }, [lng, setLng]);
+
   const onPinInputComplete = useCallback((newShareKey) => {
-    history.pushState(null, '', `/?key=${newShareKey}`)
+    const q = qs.parse(location.search);
+    q.key = newShareKey;
+    history.pushState(null, '', `/?${qs.stringify(q)}`)
     socket.disconnect();
     socket.connect();
   }, []);
@@ -326,7 +343,18 @@ function Page(props: Props) {
 
       <Box p={4}>
         <Stack>
-          <Heading as="h3" size="sm">{t('you')}</Heading>
+          <Flex>
+            <Center>
+              <Heading as="h3" size="sm">{t('you')}</Heading>
+            </Center>
+            <Spacer />
+            <Box>
+              <Select onChange={onLanguageSelectChange} value={lng}>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+              </Select>
+            </Box>
+          </Flex>
           <Flex>
             <Avatar
               size='lg'
