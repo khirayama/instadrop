@@ -238,11 +238,10 @@ function Page(props: Props) {
         files: fs,
       };
       socket.emit('share:files', payload, (res) => {
-        const targetUsers = users.filter((u) => selectedUserIds.indexOf(u.id) !== -1);
         if (res.status === 'ok') {
           el.value = '';
           toast({
-            title: `${fs.length}件のファイルを${targetUsers.map((user) => user.name).join('、')}に共有しました`,
+            title: t('sharedFileMessage', { count: fs.length }),
             duration: 4000,
           });
           setSelectedUserIds([]);
@@ -258,11 +257,10 @@ function Page(props: Props) {
       text: inputText,
     };
     socket.emit('share:text', payload, (res) => {
-      const targetUsers = users.filter((u) => selectedUserIds.indexOf(u.id) !== -1);
       if (res.status === 'ok') {
         setInputText('');
         toast({
-          title: `入力したテキストを${targetUsers.map((user) => user.name).join('、')}に共有しました`,
+          title: t('sharedTextMessage'),
           duration: 4000,
         });
         setSelectedUserIds([]);
