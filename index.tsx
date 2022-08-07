@@ -45,6 +45,9 @@ import { Invitation } from './components/Invitation';
 i18next
   .use(LanguageDetector)
   .init({
+    detection: {
+      lookupQuerystring: 'hl',
+    },
     fallbackLng: 'en',
     resources: {
       en: {
@@ -118,7 +121,7 @@ function Page(props: Props) {
   const [ inputText, setInputText ] = useState('');
   const [ text, setText ] = useState('');
   const [ selectedUserIds, setSelectedUserIds ] = useState([]);
-  const [ lng, setLng ] = useState(i18next.language);
+  const [ hl, setHl ] = useState(i18next.language);
 
   const invitationModalDisclosure = useDisclosure();
   const fileRecieveModalDisclosure = useDisclosure();
@@ -179,12 +182,12 @@ function Page(props: Props) {
 
   const onLanguageSelectChange = useCallback((event: FormEvent<SelectHTMLElement>) => {
     const q = qs.parse(location.search);
-    const lang = event.currentTarget.value;
-    q.lng = lang;
+    const lng = event.currentTarget.value;
+    q.hl = lng;
     history.replaceState(null, '', `/?${qs.stringify(q)}`)
-    i18next.changeLanguage(lang);
-    setLng(lang);
-  }, [lng, setLng]);
+    i18next.changeLanguage(lng);
+    setHl(lng);
+  }, [hl, setHl]);
 
   const onPinInputComplete = useCallback((newShareKey) => {
     const q = qs.parse(location.search);
@@ -349,7 +352,7 @@ function Page(props: Props) {
             </Center>
             <Spacer />
             <Box>
-              <Select onChange={onLanguageSelectChange} value={lng}>
+              <Select onChange={onLanguageSelectChange} value={hl}>
                 <option value="en">English</option>
                 <option value="ja">日本語</option>
               </Select>
