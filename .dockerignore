@@ -1,3 +1,9 @@
+.git
+
 Dockerfile
 README.md
 node_modules
+
+.cache
+.parcel-cache
+dist
