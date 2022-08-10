@@ -89,6 +89,7 @@ export function Invitation(props: Props) {
               if (/([0-9a-zA-Z]{4})/.test(shareKey)) {
                 props.onPinInputComplete(shareKey);
                 event.currentTarget.value = '';
+                event.currentTarget.blur();
               }
             }}
           />
