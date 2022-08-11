@@ -1,4 +1,5 @@
 const express = require('express');
+const compression = require('compression');
 const http = require('http');
 const socketIO = require('socket.io');
 const queryString = require('query-string');
@@ -94,7 +95,9 @@ function generateUser(id, ua) {
 const port = process.env.PORT || 3000;
 
 const app = express();
-app.use(express.static('dist'));
+app
+  .use(compression())
+  .use(express.static('dist'));
 
 const server = http.createServer(app);
 const io = socketIO(server, {
