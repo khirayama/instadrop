@@ -69,7 +69,7 @@ export function Invitation(props: Props) {
           onCopy();
         }}>
           <Button w="100%" justifyContent="left">{url}</Button>
-          <IconButton icon={<CopyIcon />} />
+          <IconButton icon={<CopyIcon />} aria-label={t('copy')} />
         </ButtonGroup>
       </Flex>
 
