@@ -23,7 +23,7 @@ import {
 import { CopyIcon } from '@chakra-ui/icons';
 import i18next from 'i18next';
 
-const width = 128;
+const size = 128;
 const t = i18next.t;
 
 function generateURL(shareKey: string) {
@@ -41,7 +41,7 @@ export function Invitation(props: Props) {
   const toast = useToast()
   const { hasCopied, onCopy } = useClipboard(url);
 
-  qrcode.toDataURL(url, { width, margin: 0 }, (err, q) => {
+  qrcode.toDataURL(url, { width: size * 2, margin: 0 }, (err, q) => {
     if (q !== qr) {
       setQR(q);
     }
@@ -55,7 +55,7 @@ export function Invitation(props: Props) {
         <Center>
           <Stack>
             <Heading size="2xl">{props.shareKey ? props.shareKey : t('loadingShareKey')}</Heading>
-            <Image src={qr} fallbackSrc='https://via.placeholder.com/198' />
+            <Image alt={t('qrcodeAlt', { shareKey: props.shareKey })} src={qr} width={size} height={size} />
           </Stack>
         </Center>
       </Stack>
