@@ -75,7 +75,7 @@ export function Invitation(props: Props) {
 
       <Divider />
 
-      <Flex pt={4} pb={4}>
+      <Flex py={4}>
         <Stack w="100%">
           <Heading size="md">{t('join')}</Heading>
           <Input
