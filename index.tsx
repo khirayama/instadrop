@@ -121,7 +121,7 @@ function Page(props: Props) {
   const [ inputText, setInputText ] = useState('');
   const [ text, setText ] = useState('');
   const [ selectedUserIds, setSelectedUserIds ] = useState([]);
-  const [ hl, setHl ] = useState(i18next.language);
+  const [ hl, setHl ] = useState(i18next.resolvedLanguage);
 
   const invitationModalDisclosure = useDisclosure();
   const fileRecieveModalDisclosure = useDisclosure();
