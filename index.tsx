@@ -60,6 +60,7 @@ i18next
           shareFileButton: 'SHARE FILES',
           invite: 'Invite',
           loadingShareKey: 'Loading',
+          copy: 'COPY',
           copyToast: 'Copied',
           join: 'Join',
           shareKeyInputPlaceholder: '4-digit share key',
@@ -70,6 +71,7 @@ i18next
           shareTextPlaceholder: 'Input text',
           submitButton: 'SUBMIT',
           sharedTextMessage: 'Shared text',
+          qrcodeAlt: 'QR Code for {{shareKey}}',
         }
       },
       ja: {
@@ -82,6 +84,7 @@ i18next
           shareFileButton: 'ファイルを共有する',
           invite: '招待する',
           loadingShareKey: '取得中',
+          copy: 'コピー',
           copyToast: 'コピーしました',
           join: '参加する',
           shareKeyInputPlaceholder: '4桁の共有キーを入力',
@@ -92,6 +95,7 @@ i18next
           shareTextPlaceholder: 'テキストを入力',
           submitButton: '送信',
           sharedTextMessage: 'テキストを共有されました',
+          qrcodeAlt: '{{shareKey}}のQRコード',
         }
       }
     }
