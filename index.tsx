@@ -337,12 +337,16 @@ function Page(props: Props) {
         </ModalContent>
       </Modal>
 
-      <Center p={4} bg="blue.100">
-        <Button
-          variant="link"
-          onClick={onCreateNewSpaceButton}
-        >{t('createNewSpaceButton')}</Button>
-      </Center>
+      <Button
+        p={4}
+        w="100%"
+        h="100%"
+        bg="blue.100"
+        borderRadius="none"
+        color="gray.700"
+        variant="link"
+        onClick={onCreateNewSpaceButton}
+      >{t('createNewSpaceButton')}</Button>
 
       <Divider />
 
