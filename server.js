@@ -1,156 +1,156 @@
-const express = require('express');
-const compression = require('compression');
-const http = require('http');
-const socketIO = require('socket.io');
-const queryString = require('query-string');
-const uaParser = require('ua-parser-js');
+const express = require('express')
+const compression = require('compression')
+const http = require('http')
+const socketIO = require('socket.io')
+const queryString = require('query-string')
+const uaParser = require('ua-parser-js')
 
-const rooms = {};
+const rooms = {}
 
-function generateKey() {
-  const chars = 'abcdefghijklmnopqrstuvwxyz012345689';
+function generateKey () {
+  const chars = 'abcdefghijklmnopqrstuvwxyz012345689'
   const key = [
     chars[Math.floor(Math.random() * chars.length)],
     chars[Math.floor(Math.random() * chars.length)],
     chars[Math.floor(Math.random() * chars.length)],
-    chars[Math.floor(Math.random() * chars.length)],
+    chars[Math.floor(Math.random() * chars.length)]
   ].join('')
-  return key;
+  return key
 }
 
-function getNewKey() {
-  let key = generateKey();
+function getNewKey () {
+  let key = generateKey()
   while (rooms[key]) {
-    key = generateKey();
+    key = generateKey()
   }
-  return key;
+  return key
 }
 
-function generateUser(id, ua) {
+function generateUser (id, ua) {
   const animals = [
     {
       name: 'Dog',
-      icon: '🐶',
+      icon: '🐶'
     },
     {
       name: 'Cat',
-      icon: '🐱',
+      icon: '🐱'
     },
     {
       name: 'Wolf',
-      icon: '🐺',
+      icon: '🐺'
     },
     {
       name: 'Wolf',
-      icon: '🐺',
+      icon: '🐺'
     },
     {
       name: 'Wolf',
-      icon: '🐺',
+      icon: '🐺'
     },
     {
       name: 'Fox',
-      icon: '🦊',
+      icon: '🦊'
     },
     {
       name: 'Raccoon',
-      icon: '🦝',
+      icon: '🦝'
     },
     {
       name: 'Lion',
-      icon: '🦁',
+      icon: '🦁'
     },
     {
       name: 'Tiger',
-      icon: '🐯',
+      icon: '🐯'
     },
     {
       name: 'Horse',
-      icon: '🐴',
+      icon: '🐴'
     },
     {
       name: 'Unicorn',
-      icon: '🦄',
+      icon: '🦄'
     },
     {
       name: 'Zebra',
-      icon: '🦓',
+      icon: '🦓'
     },
     {
       name: 'Cow',
-      icon: '🐮',
+      icon: '🐮'
     }
-  ];
-  const animal = animals[Math.floor(Math.random() * animals.length)];
-  const d = uaParser(ua);
+  ]
+  const animal = animals[Math.floor(Math.random() * animals.length)]
+  const d = uaParser(ua)
   return {
     id,
     name: animal.name,
     icon: animal.icon,
     device: d.device.model || d.os.name,
-    browser: d.browser.name,
-  };
+    browser: d.browser.name
+  }
 }
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000
 
-const app = express();
+const app = express()
 app
   .use(compression())
-  .use(express.static('dist'));
+  .use(express.static('dist'))
 
-const server = http.createServer(app);
+const server = http.createServer(app)
 const io = socketIO(server, {
-  maxHttpBufferSize: 2e10, // 200MB
+  maxHttpBufferSize: 2e10 // 200MB
   // cors: {
   //   origin: 'http://192.168.68.117:1234',
   //   // methods: ['GET', 'POST']
   // },
-});
+})
 
 io.on('connection', (socket) => {
   const query = queryString.parse(socket.handshake.headers.referer.split('?')[1])
-  const id = socket.id;
-  const user = generateUser(id, socket.handshake.headers['user-agent']);
+  const id = socket.id
+  const user = generateUser(id, socket.handshake.headers['user-agent'])
 
-  const key = query.key || getNewKey();
+  const key = query.key || getNewKey()
   if (rooms[key]) {
-    rooms[key].push(user);
+    rooms[key].push(user)
   } else {
     rooms[key] = [user]
   }
 
   const payload = {
     key,
-    user,
-  };
-  io.to(id).emit('update:user', payload);
-  io.to(rooms[key].map((u) => u.id)).emit('update:users', { users: rooms[key] });
+    user
+  }
+  io.to(id).emit('update:user', payload)
+  io.to(rooms[key].map((u) => u.id)).emit('update:users', { users: rooms[key] })
 
   socket.on('disconnect', () => {
-    rooms[key] = rooms[key].filter((u) => u.id !== socket.id);
+    rooms[key] = rooms[key].filter((u) => u.id !== socket.id)
     if (!rooms[key].length) {
-      delete rooms[key];
+      delete rooms[key]
     } else {
-      io.to(rooms[key].map((u) => u.id)).emit('update:users', { users: rooms[key] });
+      io.to(rooms[key].map((u) => u.id)).emit('update:users', { users: rooms[key] })
     }
-  });
+  })
 
-  socket.on('share:files', (d, callback) => {
+  socket.on('share:files', (d, fn) => {
     if (d.to) {
-      io.to(d.to).emit('share:files', { files: d.files });
-      callback({ status: 'ok' });
+      io.to(d.to).emit('share:files', { files: d.files })
+      fn({ status: 'ok' })
     }
-  });
+  })
 
-  socket.on('share:text', (d, callback) => {
+  socket.on('share:text', (d, fn) => {
     if (d.to) {
-      io.to(d.to).emit('share:text', { text: d.text });
-      callback({ status: 'ok' });
+      io.to(d.to).emit('share:text', { text: d.text })
+      fn({ status: 'ok' })
     }
-  });
-});
+  })
+})
 
 server.listen(port, () => {
-  console.log(`Socket.IO server running at http://localhost:${port}/`);
-});
+  console.log(`Socket.IO server running at http://localhost:${port}/`)
+})
