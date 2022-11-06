@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react'
 
 
-type Props = {
+export type Props = {
   user: User;
   selected: boolean;
   onClick: (event: MouseEvent<HTMLDivElement>, props: Props) => void;
