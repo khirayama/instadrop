@@ -1,7 +1,6 @@
-import { createRoot } from 'react-dom/client';
-import { useState, useEffect, useCallback, createRef, FormEvent, StrictMode } from 'react';
-import classNames from 'classnames';
-import { io, Socket } from 'socket.io-client';
+import { createRoot } from 'react-dom/client'
+import React, { useState, useEffect, useCallback, createRef, FormEvent, StrictMode } from 'react'
+import { io, Socket } from 'socket.io-client'
 import {
   ChakraProvider,
   IconButton,
@@ -19,7 +18,6 @@ import {
   Spacer,
   Divider,
   Avatar,
-  AvatarGroup,
   Input,
   Select,
   Modal,
@@ -31,22 +29,22 @@ import {
   ModalCloseButton,
   useDisclosure,
   useToast,
-  useClipboard,
+  useClipboard
 } from '@chakra-ui/react'
-import { CopyIcon } from '@chakra-ui/icons';
-import i18next from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import * as qs from 'query-string';
+import { CopyIcon } from '@chakra-ui/icons'
+import i18next from 'i18next'
+import LanguageDetector from 'i18next-browser-languagedetector'
+import * as qs from 'query-string'
 
-import { FileRecieveModal } from './components/FileRecieveModal';
-import { UserForm } from './components/UserForm';
-import { Invitation } from './components/Invitation';
+import { FileRecieveModal } from './components/FileRecieveModal'
+import { UserForm, Props as UserFormProps } from './components/UserForm'
+import { Invitation } from './components/Invitation'
 
 i18next
   .use(LanguageDetector)
   .init({
     detection: {
-      lookupQuerystring: 'hl',
+      lookupQuerystring: 'hl'
     },
     fallbackLng: 'en',
     resources: {
@@ -71,7 +69,7 @@ i18next
           shareTextPlaceholder: 'Input text',
           submitButton: 'SUBMIT',
           sharedTextMessage: 'Shared text',
-          qrcodeAlt: 'QR Code for {{shareKey}}',
+          qrcodeAlt: 'QR Code for {{shareKey}}'
         }
       },
       ja: {
@@ -95,183 +93,186 @@ i18next
           shareTextPlaceholder: 'テキストを入力',
           submitButton: '送信',
           sharedTextMessage: 'テキストを共有されました',
-          qrcodeAlt: '{{shareKey}}のQRコード',
+          qrcodeAlt: '{{shareKey}}のQRコード'
         }
       }
     }
-  });
+  }).catch(err => {
+    throw err
+  })
 
-const t = i18next.t;
+const t = i18next.t
 
-export type User = {
-  id: string;
-  name: string;
-  icon: string;
-  device: string;
-  browser: string;
-};
+export interface User {
+  id: string
+  name: string
+  icon: string
+  device: string
+  browser: string
+}
 
-type Props = {
-  socket: Socket;
-};
+interface Props {
+  socket: Socket
+}
 
-function Page(props: Props) {
-  const socket = props.socket;
+function Page (props: Props): JSX.Element {
+  const socket = props.socket
 
-  const [ user, setUser ] = useState<User>({ id: '', name: '', icon: '' });
-  const [ users, setUsers ] = useState([]);
-  const [ shareKey, setShareKey ] = useState('');
-  const [ files, setFiles ] = useState([]);
-  const [ inputText, setInputText ] = useState('');
-  const [ text, setText ] = useState('');
-  const [ selectedUserIds, setSelectedUserIds ] = useState([]);
-  const [ hl, setHl ] = useState(i18next.resolvedLanguage);
+  const [user, setUser] = useState<User>({ id: '', name: '', icon: '' })
+  const [users, setUsers] = useState([])
+  const [shareKey, setShareKey] = useState('')
+  const [files, setFiles] = useState([])
+  const [inputText, setInputText] = useState('')
+  const [text, setText] = useState('')
+  const [selectedUserIds, setSelectedUserIds] = useState([])
+  const [hl, setHl] = useState(i18next.resolvedLanguage)
 
-  const invitationModalDisclosure = useDisclosure();
-  const fileRecieveModalDisclosure = useDisclosure();
-  const textSendingModalDisclosure = useDisclosure();
-  const textRecieveModalDisclosure = useDisclosure();
-  const { hasCopied, onCopy } = useClipboard(text);
-  const toast = useToast();
+  const invitationModalDisclosure = useDisclosure()
+  const fileRecieveModalDisclosure = useDisclosure()
+  const textSendingModalDisclosure = useDisclosure()
+  const textRecieveModalDisclosure = useDisclosure()
+  const { onCopy } = useClipboard(text)
+  const toast = useToast()
 
-  const refInputFile = createRef();
+  const refInputFile = createRef()
 
   useEffect(() => {
-    function popstateHandler() {
-      socket.disconnect();
-      socket.connect();
+    function popstateHandler (): void {
+      socket.disconnect()
+      socket.connect()
     }
 
     socket.on('update:user', (d) => {
       setShareKey(d.key)
       setUser(d.user)
-      const q = qs.parse(location.search);
-      q.key = d.key;
+      const q = qs.parse(location.search)
+      q.key = d.key
       history.replaceState(null, '', `/?${qs.stringify(q)}`)
-    });
+    })
 
     socket.on('update:users', (d) => {
-      setUsers(d.users);
-    });
+      setUsers(d.users)
+    })
 
     socket.on('share:files', (payload) => {
-      const fs = payload.files.map((f) => new File([f.data], f.name, { type: f.type }));
-      setFiles(fs);
-      fileRecieveModalDisclosure.onOpen();
-    });
+      const fs = payload.files.map((f) => new File([f.data], f.name, { type: f.type }))
+      setFiles(fs)
+      fileRecieveModalDisclosure.onOpen()
+    })
 
     socket.on('share:text', (payload) => {
-      setText(payload.text);
-      textRecieveModalDisclosure.onOpen();
-    });
+      setText(payload.text)
+      textRecieveModalDisclosure.onOpen()
+    })
 
-    window.addEventListener('popstate', popstateHandler);
+    window.addEventListener('popstate', popstateHandler)
 
-    return function cleanup() {
-      socket.off('update:user');
-      socket.off('update:users');
-      socket.off('share:files');
-      socket.off('share:text');
-      window.removeEventListener('popstate', popstateHandler);
-    };
-  });
+    return function cleanup () {
+      socket.off('update:user')
+      socket.off('update:users')
+      socket.off('share:files')
+      socket.off('share:text')
+      window.removeEventListener('popstate', popstateHandler)
+    }
+  })
 
   const onCreateNewSpaceButton = useCallback(() => {
-    const q = qs.parse(location.search);
-    delete q.key;
+    const q = qs.parse(location.search)
+    delete q.key
     history.pushState(null, '', `/?${qs.stringify(q)}`)
-    socket.disconnect();
-    socket.connect();
-  }, []);
+    socket.disconnect()
+    socket.connect()
+  }, [])
 
   const onLanguageSelectChange = useCallback((event: FormEvent<SelectHTMLElement>) => {
-    const q = qs.parse(location.search);
-    const lng = event.currentTarget.value;
-    q.hl = lng;
+    const q = qs.parse(location.search)
+    const lng = event.currentTarget.value
+    q.hl = lng
     history.replaceState(null, '', `/?${qs.stringify(q)}`)
-    i18next.changeLanguage(lng);
-    setHl(lng);
-  }, [hl, setHl]);
+    i18next.changeLanguage(lng).catch(err => {
+      throw err
+    })
+    setHl(lng)
+  }, [hl, setHl])
 
   const onPinInputComplete = useCallback((newShareKey) => {
-    const q = qs.parse(location.search);
-    q.key = newShareKey;
+    const q = qs.parse(location.search)
+    q.key = newShareKey
     history.pushState(null, '', `/?${qs.stringify(q)}`)
-    socket.disconnect();
-    socket.connect();
-  }, []);
+    socket.disconnect()
+    socket.connect()
+  }, [])
 
   const onPaste = useCallback((event: ClipboardEvent<HTMLFormElement>) => {
-    if (event.clipboardData.types[0] === "Files") {
-      const dt = new DataTransfer();
+    if (event.clipboardData.types[0] === 'Files') {
+      const dt = new DataTransfer()
       for (let i = 0; i < event.clipboardData.items.length; i += 1) {
-        const item = event.clipboardData.items[i];
-        dt.items.add(item.getAsFile());
+        const item = event.clipboardData.items[i]
+        dt.items.add(item.getAsFile())
       }
-      refInputFile.current.files = dt.files;
-      refInputFile.current.dispatchEvent(new Event('change', { bubbles: true }));
-      setInputText('');
-      textSendingModalDisclosure.onClose();
+      refInputFile.current.files = dt.files
+      refInputFile.current.dispatchEvent(new Event('change', { bubbles: true }))
+      setInputText('')
+      textSendingModalDisclosure.onClose()
     }
-  }, [refInputFile, setInputText, textSendingModalDisclosure]);
+  }, [refInputFile, setInputText, textSendingModalDisclosure])
 
   const onUserFormClick = useCallback((event: MouseEvent<HTMLDivElement>, userFormProps: UserFormProps) => {
     if (userFormProps.selected) {
       const newSelectedUsers = selectedUserIds.filter((userId) => {
-        return userFormProps.user.id !== userId;
-      });
-      setSelectedUserIds(newSelectedUsers);
+        return userFormProps.user.id !== userId
+      })
+      setSelectedUserIds(newSelectedUsers)
     } else {
-      setSelectedUserIds([...selectedUserIds, userFormProps.user.id]);
+      setSelectedUserIds([...selectedUserIds, userFormProps.user.id])
     }
-  }, [selectedUserIds]);
+  }, [selectedUserIds])
 
   const onFileInputChange = useCallback((event: FormEvent<HTMLInputElement>) => {
-    const el = event.target;
+    const el = event.target
     if (el.type === 'file') {
-      const d = new FormData();
       const fs = Array.from(el.files).map((f: File) => {
         return {
           name: f.name,
           type: f.type,
-          data: f,
-        };
-      });
+          data: f
+        }
+      })
       const payload = {
         to: selectedUserIds,
-        files: fs,
-      };
+        files: fs
+      }
       socket.emit('share:files', payload, (res) => {
         if (res.status === 'ok') {
-          el.value = '';
+          el.value = ''
           toast({
             title: t('sharedFileMessage', { count: fs.length }),
-            duration: 4000,
-          });
-          setSelectedUserIds([]);
+            duration: 4000
+          })
+          setSelectedUserIds([])
         }
-      });
+      })
     }
-  }, [users, selectedUserIds]);
+  }, [users, selectedUserIds])
 
   const onTextSubmit = useCallback((event: FormEvent<HTMLInputElement>) => {
-    event.preventDefault();
+    event.preventDefault()
     const payload = {
       to: selectedUserIds,
-      text: inputText,
-    };
+      text: inputText
+    }
     socket.emit('share:text', payload, (res) => {
       if (res.status === 'ok') {
-        setInputText('');
+        setInputText('')
         toast({
           title: t('sharedTextMessage'),
-          duration: 4000,
-        });
-        setSelectedUserIds([]);
-        textSendingModalDisclosure.onClose();
+          duration: 4000
+        })
+        setSelectedUserIds([])
+        textSendingModalDisclosure.onClose()
       }
-    });
-  }, [user, selectedUserIds, inputText]);
+    })
+  }, [user, selectedUserIds, inputText])
 
   return (
     <>
@@ -281,8 +282,8 @@ function Page(props: Props) {
           <ModalCloseButton />
           <ModalBody p={4}>
             <Invitation shareKey={shareKey} onPinInputComplete={(newShareKey) => {
-              onPinInputComplete(newShareKey);
-              invitationModalDisclosure.onClose();
+              onPinInputComplete(newShareKey)
+              invitationModalDisclosure.onClose()
             }}/>
           </ModalBody>
           <ModalFooter>
@@ -322,9 +323,9 @@ function Page(props: Props) {
               <ButtonGroup w="100%" isAttached variant='outline' onClick={() => {
                 toast({
                   title: t('copyToast'),
-                  duration: 4000,
-                });
-                onCopy();
+                  duration: 4000
+                })
+                onCopy()
               }}>
                 <Button w="100%" justifyContent="left">{text}</Button>
                 <IconButton icon={<CopyIcon />} />
@@ -384,7 +385,8 @@ function Page(props: Props) {
       <Divider />
 
       <Box>
-        {users.length > 1 ? (
+        {users.length > 1
+          ? (
           <Stack p={4}>
             <Flex>
               <Center>
@@ -398,14 +400,14 @@ function Page(props: Props) {
             </Flex>
             <Grid templateColumns="repeat(auto-fit, minmax(92px, 1fr))">
               {users
-              .filter((u) => u.id !== user.id)
-              .map((u) => {
-                return (
+                .filter((u) => u.id !== user.id)
+                .map((u) => {
+                  return (
                   <GridItem key={u.id}>
-                    <UserForm key={u.id} user={u} selected={selectedUserIds.indexOf(u.id) !== -1} onClick={onUserFormClick} />
+                    <UserForm key={u.id} user={u} selected={selectedUserIds.includes(u.id)} onClick={onUserFormClick} />
                   </GridItem>
-                );
-              })}
+                  )
+                })}
             </Grid>
             <Flex justifyContent="center">
               <HStack>
@@ -417,24 +419,25 @@ function Page(props: Props) {
               </HStack>
             </Flex>
           </Stack>
-          ) : (
+            )
+          : (
           <Box py={16}>
             <Center>
               <Invitation shareKey={shareKey} onPinInputComplete={onPinInputComplete}/>
             </Center>
           </Box>
-        )}
+            )}
       </Box>
     </>
-  );
+  )
 }
 
-const container = document.getElementById('app');
-const root = createRoot(container);
+const container = document.getElementById('app')
+const root = createRoot(container)
 root.render(
   <StrictMode>
     <ChakraProvider>
       <Page socket={io()} />
     </ChakraProvider>
-  </StrictMode>,
+  </StrictMode>
 )
