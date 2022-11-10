@@ -1,6 +1,6 @@
-import { createRef, useCallback, ClipboardEvent, MouseEvent } from 'react';
+import React, { MouseEvent } from 'react'
 
-import { User } from '../index';
+import { User } from '../index'
 import {
   Avatar,
   AvatarBadge,
@@ -8,17 +8,16 @@ import {
   Stack,
   Center,
   Text,
-  Heading,
+  Heading
 } from '@chakra-ui/react'
 
+export interface Props {
+  user: User
+  selected: boolean
+  onClick: (event: MouseEvent<HTMLDivElement>, props: Props) => void
+}
 
-export type Props = {
-  user: User;
-  selected: boolean;
-  onClick: (event: MouseEvent<HTMLDivElement>, props: Props) => void;
-};
-
-export function UserForm(props: Props) {
+export function UserForm (props: Props): JSX.Element {
   return (
     <Box
       onClick={(event) => props.onClick(event, props)}
@@ -44,5 +43,5 @@ export function UserForm(props: Props) {
         </Stack>
       </Center>
     </Box>
-  );
+  )
 }
