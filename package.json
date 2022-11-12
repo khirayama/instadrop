@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "parcel watch index.html & node server.js",
-    "build": "parcel build index.html",
+    "dev": "parcel watch index.html ja/index.html & node server.js",
+    "build": "parcel build index.html ja/index.html",
     "start": "node server.js"
   },
   "keywords": [],
