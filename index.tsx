@@ -43,9 +43,6 @@ import { Invitation } from './components/Invitation'
 i18next
   .use(LanguageDetector)
   .init({
-    detection: {
-      lookupQuerystring: 'hl'
-    },
     fallbackLng: 'en',
     resources: {
       en: {
@@ -115,6 +112,14 @@ interface Props {
   socket: Socket
 }
 
+export function basePath (lng: string): string {
+  const defaultLng = i18next.options.fallbackLng[0]
+  if (lng === defaultLng) {
+    return '/'
+  }
+  return `/${lng}/`
+}
+
 function Page (props: Props): JSX.Element {
   const socket = props.socket
 
@@ -125,7 +130,7 @@ function Page (props: Props): JSX.Element {
   const [inputText, setInputText] = useState('')
   const [text, setText] = useState('')
   const [selectedUserIds, setSelectedUserIds] = useState([])
-  const [hl, setHl] = useState(i18next.resolvedLanguage)
+  const [lng, setLng] = useState(i18next.resolvedLanguage)
 
   const invitationModalDisclosure = useDisclosure()
   const fileRecieveModalDisclosure = useDisclosure()
@@ -147,7 +152,7 @@ function Page (props: Props): JSX.Element {
       setUser(d.user)
       const q = qs.parse(location.search)
       q.key = d.key
-      history.replaceState(null, '', `/?${qs.stringify(q)}`)
+      history.replaceState(null, '', `${basePath(lng)}?${qs.stringify(q)}`)
     })
 
     socket.on('update:users', (d) => {
@@ -179,7 +184,7 @@ function Page (props: Props): JSX.Element {
   const onCreateNewSpaceButton = useCallback(() => {
     const q = qs.parse(location.search)
     delete q.key
-    history.pushState(null, '', `/?${qs.stringify(q)}`)
+    history.pushState(null, '', `${basePath(lng)}?${qs.stringify(q)}`)
     socket.disconnect()
     socket.connect()
   }, [])
@@ -187,18 +192,17 @@ function Page (props: Props): JSX.Element {
   const onLanguageSelectChange = useCallback((event: FormEvent<SelectHTMLElement>) => {
     const q = qs.parse(location.search)
     const lng = event.currentTarget.value
-    q.hl = lng
-    history.replaceState(null, '', `/?${qs.stringify(q)}`)
+    history.replaceState(null, '', `${basePath(lng)}?${qs.stringify(q)}`)
     i18next.changeLanguage(lng).catch(err => {
       throw err
     })
-    setHl(lng)
-  }, [hl, setHl])
+    setLng(lng)
+  }, [lng, setLng])
 
   const onPinInputComplete = useCallback((newShareKey) => {
     const q = qs.parse(location.search)
     q.key = newShareKey
-    history.pushState(null, '', `/?${qs.stringify(q)}`)
+    history.pushState(null, '', `${basePath(lng)}?${qs.stringify(q)}`)
     socket.disconnect()
     socket.connect()
   }, [])
@@ -281,7 +285,7 @@ function Page (props: Props): JSX.Element {
         <ModalContent w="88%" maxW="420px">
           <ModalCloseButton />
           <ModalBody p={4}>
-            <Invitation shareKey={shareKey} onPinInputComplete={(newShareKey) => {
+            <Invitation lng={lng} shareKey={shareKey} onPinInputComplete={(newShareKey) => {
               onPinInputComplete(newShareKey)
               invitationModalDisclosure.onClose()
             }}/>
@@ -359,7 +363,7 @@ function Page (props: Props): JSX.Element {
             </Center>
             <Spacer />
             <Box>
-              <Select onChange={onLanguageSelectChange} value={hl}>
+              <Select onChange={onLanguageSelectChange} value={lng}>
                 <option value="en">English</option>
                 <option value="ja">日本語</option>
               </Select>
@@ -423,7 +427,7 @@ function Page (props: Props): JSX.Element {
           : (
           <Box py={16}>
             <Center>
-              <Invitation shareKey={shareKey} onPinInputComplete={onPinInputComplete}/>
+              <Invitation lng={lng} shareKey={shareKey} onPinInputComplete={onPinInputComplete}/>
             </Center>
           </Box>
             )}
