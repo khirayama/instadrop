@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import qrcode from 'qrcode';
+import { useState, useCallback } from 'react'
+import qrcode from 'qrcode'
 import {
   Box,
   Center,
@@ -18,35 +18,37 @@ import {
   PinInput,
   PinInputField,
   useToast,
-  useClipboard,
+  useClipboard
 } from '@chakra-ui/react'
-import { CopyIcon } from '@chakra-ui/icons';
-import i18next from 'i18next';
+import { CopyIcon } from '@chakra-ui/icons'
+import i18next from 'i18next'
 
-const size = 128;
-const t = i18next.t;
+import { basePath } from '../index'
 
-function generateURL(shareKey: string) {
-  return `${window.location.origin}?key=${shareKey}`;
+const size = 128
+const t = i18next.t
+
+function generateURL (lng: string, shareKey: string): string {
+  return `${window.location.origin}${basePath(lng)}?key=${shareKey}`
 }
 
-type Props = {
-  shareKey: string;
-  onPinInputComplete: Function;
-};
+interface Props {
+  lng: string
+  shareKey: string
+  onPinInputComplete: Function
+}
 
-export function Invitation(props: Props) {
-  const [ qr, setQR ] = useState('');
-  const url = generateURL(props.shareKey);
+export function Invitation (props: Props) {
+  const [qr, setQR] = useState('')
+  const url = generateURL(props.lng, props.shareKey)
   const toast = useToast()
-  const { hasCopied, onCopy } = useClipboard(url);
+  const { hasCopied, onCopy } = useClipboard(url)
 
   qrcode.toDataURL(url, { width: size * 2, margin: 0 }, (err, q) => {
     if (q !== qr) {
-      setQR(q);
+      setQR(q)
     }
-  });
-
+  })
 
   return (
     <Box>
@@ -64,9 +66,9 @@ export function Invitation(props: Props) {
         <ButtonGroup w="100%" isAttached variant='outline' onClick={() => {
           toast({
             title: t('copyToast'),
-            duration: 4000,
-          });
-          onCopy();
+            duration: 4000
+          })
+          onCopy()
         }}>
           <Button w="100%" justifyContent="left">{url}</Button>
           <IconButton icon={<CopyIcon />} aria-label={t('copy')} />
@@ -85,16 +87,16 @@ export function Invitation(props: Props) {
             placeholder={t('shareKeyInputPlaceholder')}
             maxLength={6}
             onChange={(event) => {
-              const shareKey = event.currentTarget.value;
+              const shareKey = event.currentTarget.value
               if (/([0-9a-zA-Z]{4})/.test(shareKey)) {
-                props.onPinInputComplete(shareKey);
-                event.currentTarget.value = '';
-                event.currentTarget.blur();
+                props.onPinInputComplete(shareKey)
+                event.currentTarget.value = ''
+                event.currentTarget.blur()
               }
             }}
           />
         </Stack>
       </Flex>
     </Box>
-  );
+  )
 }
