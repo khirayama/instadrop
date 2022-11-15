@@ -1,10 +1,9 @@
-import { useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import qrcode from 'qrcode'
 import {
   Box,
   Center,
   Heading,
-  Text,
   Flex,
   Button,
   ButtonGroup,
@@ -12,11 +11,7 @@ import {
   Image,
   Stack,
   Divider,
-  FormLabel,
-  HStack,
   Input,
-  PinInput,
-  PinInputField,
   useToast,
   useClipboard
 } from '@chakra-ui/react'
@@ -38,13 +33,13 @@ interface Props {
   onPinInputComplete: Function
 }
 
-export function Invitation (props: Props) {
+export function Invitation (props: Props): JSX.Element {
   const [qr, setQR] = useState('')
   const url = generateURL(props.lng, props.shareKey)
   const toast = useToast()
-  const { hasCopied, onCopy } = useClipboard(url)
+  const { onCopy } = useClipboard(url)
 
-  qrcode.toDataURL(url, { width: size * 2, margin: 0 }, (err, q) => {
+  qrcode.toDataURL(url, { width: size * 2, margin: 0 }, (_, q) => {
     if (q !== qr) {
       setQR(q)
     }
@@ -56,7 +51,7 @@ export function Invitation (props: Props) {
         <Heading size="md">{t('invite')}</Heading>
         <Center>
           <Stack>
-            <Heading size="2xl">{props.shareKey ? props.shareKey : t('loadingShareKey')}</Heading>
+            <Heading size="2xl">{props.shareKey !== '' ? props.shareKey : t('loadingShareKey')}</Heading>
             <Image alt={t('qrcodeAlt', { shareKey: props.shareKey })} src={qr} width={size} height={size} />
           </Stack>
         </Center>
