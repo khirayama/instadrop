@@ -18,13 +18,11 @@ import {
 import { CopyIcon } from '@chakra-ui/icons'
 import i18next from 'i18next'
 
-import { basePath } from '../index'
-
 const size = 128
 const t = i18next.t
 
 function generateURL (lng: string, shareKey: string): string {
-  return `${window.location.origin}${basePath(lng)}?key=${shareKey}`
+  return `${window.location.origin}$/?key=${shareKey}`
 }
 
 interface Props {
