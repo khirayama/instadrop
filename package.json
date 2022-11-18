@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "parcel watch index.html ja/index.html & node server.js",
-    "build": "parcel build index.html ja/index.html",
-    "start": "node server.js"
+    "dev": "parcel watch src/index.html src/about/index.html src/ja/about/index.html & node src/server.js",
+    "build": "parcel build src/index.html src/about/index.html src/ja/about/index.html",
+    "start": "node src/server.js"
   },
   "keywords": [],
   "author": "",
