@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "parcel watch src/index.html src/about/index.html src/ja/about/index.html & node src/server.js",
-    "build": "parcel build src/index.html src/about/index.html src/ja/about/index.html",
+    "dev": "parcel watch src/index.html src/welcome/index.html src/ja/welcome/index.html & node src/server.js",
+    "build": "parcel build src/index.html src/welcome/index.html src/ja/welcome/index.html",
     "start": "node src/server.js"
   },
   "keywords": [],
