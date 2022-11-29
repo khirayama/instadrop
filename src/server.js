@@ -97,6 +97,7 @@ const port = process.env.PORT || 3000
 const app = express()
 app
   .use(compression())
+  .use(express.static('public'))
   .use(express.static('dist'))
 
 const server = http.createServer(app)
