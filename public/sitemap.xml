@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="https://www.w3.org/1999/xhtml/">
+  <url>
+    <loc>https://www.instadrop.app/</loc>
+    <lastmod>2022-11-24</lastmod>
+  </url>
+  <url>
+    <loc>https://www.instadrop.app/welcome</loc>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.instadrop.app/ja/welcome" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.instadrop.app/welcome" />
+    <lastmod>2022-11-24</lastmod>
+  </url>
+  <url>
+    <loc>https://www.instadrop.app/ja/welcome</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.instadrop.app/welcome" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.instadrop.app/welcome" />
+    <lastmod>2022-11-24</lastmod>
+  </url>
+</urlset>
