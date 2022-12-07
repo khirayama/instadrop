@@ -56,7 +56,7 @@ export function FileRecieveModal (props: FileRecieveModalProps): JSX.Element {
                   } else if (f.type.indexOf('text') === 0) {
                     preview = (
                     <Box>
-                      <Text>{f.name}</Text>;
+                      <Text>{f.name}</Text>
                       <Code>{files[f.name]}</Code>
                     </Box>
                     )
