@@ -22,7 +22,7 @@ const size = 128
 const t = i18next.t
 
 function generateURL (lng: string, shareKey: string): string {
-  return `${window.location.origin}$/?key=${shareKey}`
+  return `${window.location.origin}/?key=${shareKey}`
 }
 
 interface Props {
